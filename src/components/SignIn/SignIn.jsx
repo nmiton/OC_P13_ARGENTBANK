@@ -1,33 +1,32 @@
-import { useRef } from "react";
-import { connect } from "react-redux";
+import { useRef, useEffect } from "react";
+import { connect, useSelector } from "react-redux";
 import { loginRequest, loginSuccess, loginFailure } from "../../redux/actions";
 import { useNavigate } from "react-router-dom";
 // eslint-disable-next-line react/prop-types, react-refresh/only-export-components
 const SignIn = ({ loginRequest, loginSuccess, loginFailure }) => {
 	const inputUsernameRef = useRef(null);
+	const token = useSelector((state) => state.auth?.user?.token);
 	const inputPasswordRef = useRef(null);
 	const checkboxRememberRef = useRef(null);
 	const navigate = useNavigate();
+
+	useEffect(() => {
+		if (token) navigate("/profile");
+	}, [navigate, token]);
 
 	const handleSubmitForm = async (e) => {
 		e.preventDefault();
 
 		const username = inputUsernameRef.current.value.trim();
-		const password = inputPasswordRef.current.value;
-
-		const body = {
-			email: username,
-			password: password,
-		};
+		const password = inputPasswordRef.current.value.trim();
+		const body = { email: username, password: password };
 
 		loginRequest();
 
 		try {
 			const response = await fetch("http://localhost:3001/api/v1/user/login", {
 				method: "POST",
-				headers: {
-					"Content-Type": "application/json",
-				},
+				headers: { "Content-Type": "application/json" },
 				body: JSON.stringify(body),
 			});
 
@@ -37,6 +36,7 @@ const SignIn = ({ loginRequest, loginSuccess, loginFailure }) => {
 				loginSuccess(null, result.body.token);
 				navigate("/profile");
 			} else {
+				alert(result.message);
 				loginFailure(result.message);
 			}
 		} catch (error) {

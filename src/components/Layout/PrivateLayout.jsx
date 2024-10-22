@@ -10,9 +10,7 @@ const PrivateLayout = ({ children }) => {
 	const navigate = useNavigate();
 
 	useEffect(() => {
-		if (!token) {
-			navigate("/sign-in");
-		}
+		if (!token) navigate("/sign-in");
 	}, [navigate, token]);
 
 	return (
